@@ -11,8 +11,8 @@ public class Main {
     public static void main(String[] args) throws IOException {
         ArrayList<String> visited = new ArrayList<>();
         HashMap<String, String> path = new HashMap<>();  // hashmap for path tracing
-        String startUrl = "https://en.wikipedia.org/wiki/The_Legend_of_Zelda:_Tears_of_the_Kingdom";
-        String endUrl = "https://en.wikipedia.org/wiki/Home_video_game_console";
+        String startUrl = "https://en.wikipedia.org/wiki/MissingNo.";
+        String endUrl = "https://en.wikipedia.org/wiki/The_Legend_of_Zelda:_Tears_of_the_Kingdom";
         Queue<String> queue = new LinkedList<String>();
         LinkList site;
         
