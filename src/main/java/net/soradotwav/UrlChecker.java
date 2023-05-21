@@ -8,6 +8,13 @@ import org.jsoup.nodes.Document;
 
 public class UrlChecker {
 
+    /**
+    * Checks if the given URL starts with "https://en.wikipedia.org/".
+    * If the URL is invalid, an IllegalArgumentException is thrown with an appropriate error message.
+    * If the URL is valid, the method continues without any exceptions.
+    *
+    * @param url the URL to be checked
+    */
     public static void checkMain(String url) {
         if(!url.startsWith("https://en.wikipedia.org/")) {
             try {
@@ -19,6 +26,14 @@ public class UrlChecker {
         }
     }
 
+    /**
+    * Connects to the specified URL using Jsoup library and retrieves the web page content.
+    * The method sets the user agent and referrer to mimic a web browser's request.
+    *
+    * @param url the URL to be connected and checked
+    * @return a Jsoup Document representing the web page content
+    * @throws IOException if an I/O error occurs while connecting to the URL
+    */
     public static Document checkConnect(String url) throws IOException {
         Document doc = null;
         try {

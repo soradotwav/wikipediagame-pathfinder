@@ -11,6 +11,15 @@ public class Scraper {
 
     private static Document doc = null;
 
+    /**
+    * Retrieves a list of URLs found on the specified web page.
+    * Checks the validity of the URL and establishes a connection using the UrlChecker class.
+    * Scrapes the web page for URLs and stores them in an ArrayList.
+    *
+    * @param url the URL of the web page to be scraped
+    * @return an ArrayList of Strings containing the scraped URLs
+    * @throws IOException if an I/O error occurs while connecting to the URL
+    */
     public static ArrayList<String> cacheSite(String url) throws IOException {
 
         // Initializing connection to website
@@ -42,6 +51,15 @@ public class Scraper {
         return listOfUrls;
     }
 
+    /**
+    * Retrieves all HTML elements containing links found on the specified web page.
+    * Checks the validity of the URL and establishes a connection using the UrlChecker class.
+    * Returns the selected HTML elements.
+    *
+    * @param url the URL of the web page to be scraped
+    * @return a Jsoup Elements object containing the selected HTML elements
+    * @throws IOException if an I/O error occurs while connecting to the URL
+    */
     public static Elements getElements(String url) throws IOException {
         UrlChecker.checkMain(url);
         doc = UrlChecker.checkConnect(url);
