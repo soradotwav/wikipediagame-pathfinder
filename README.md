@@ -1,7 +1,9 @@
 
-# Wikipedia Game Path Finder 
+# Wikipedia Game Path Finder (Java)
 
 The Wikipedia Game Path Finder project is a robust web scraper that navigates from one Wikipedia page to another by following embedded article links similar to the popular "Wikipedia Game".
+
+As this project is still a Work in Progress, anything seen in the code is subject to change. See Work in Progress below to read through planned changes.
 
 The project is divided into four primary classes: `Main`, `UrlChecker`, `LinkList`, and `Scraper`. 
 * `Main`  functions as the orchestrator of the entire process, delegating tasks and invoking methods from the other classes. 
