@@ -83,9 +83,12 @@ public class Main {
     * @param url the URL to extract the name from
     * @return the extracted name
     */
-    public static String getName(String url) {
+    public static String getName(String url, boolean forApi) {
+
         url = url.replace("https://en.wikipedia.org/wiki/", "");
-        url = url.replace("_", " ");
+        if (!forApi) {
+            url = url.replace("_", " ");
+        }
 
         return url;
     }
@@ -103,7 +106,7 @@ public class Main {
         String url = endUrl;
 
         while (url != null) {
-            finalPath.addFirst(getName(url));
+            finalPath.addFirst(getName(url, false));
             url = path.get(url);
         }
 
