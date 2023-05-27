@@ -17,7 +17,7 @@ public class MediaWikiApi {
 
     public static HashMap<String, ArrayList<String>> getCategories(String currUrls) {
 
-        if (categoryHashMap.containsKey(currUrls)) {
+        if (categoryHashMap.containsKey(currUrls)) { // !!!!!Edit to check each link in titles !!!!!//
             return categoryHashMap;
         }
 
