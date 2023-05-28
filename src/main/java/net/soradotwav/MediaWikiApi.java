@@ -2,8 +2,10 @@ package net.soradotwav;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -15,14 +17,25 @@ public class MediaWikiApi {
     private static String apiTemplate = "https://en.wikipedia.org/w/api.php?action=query&prop=categories&cllimit=100&format=json&clshow=!hidden&titles=";
     private static HashMap<String, ArrayList<String>> categoryHashMap = new HashMap<>();
 
-    public static HashMap<String, ArrayList<String>> getCategories(String currUrls) {
+    public static HashMap<String, ArrayList<String>> setCategoryMap(String urlApiString) {
 
-        if (categoryHashMap.containsKey(currUrls)) { // !!!!!Edit to check each link in titles !!!!!//
+        String[] individualItems = urlApiString.split("\\|");
+        for (int i = 0; i < individualItems.length; ++i) {
+            if (individualItems.length == 1) {
+                break;
+            } else if (categoryHashMap.containsKey(individualItems[i]) && i == individualItems.length - 1) {
+                urlApiString.replace(individualItems[i], "");
+            } else if (categoryHashMap.containsKey(individualItems[i])) {
+                urlApiString.replace(individualItems[i] + "\\|", "");
+            }
+        }
+
+        if (urlApiString.isEmpty()) {
             return categoryHashMap;
         }
 
         try {
-            URL url = new URL(apiTemplate + currUrls);
+            URL url = new URL(apiTemplate + urlApiString);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             int responseCode = connection.getResponseCode();
@@ -36,7 +49,7 @@ public class MediaWikiApi {
                 }
                 reader.close();
 
-                categoryHashMap = processApiResponse(response.toString(), currUrls);
+                categoryHashMap = processApiResponse(response.toString(), urlApiString);
 
             } else {
                 System.out.println("API request failed. Response Code: " + responseCode);
@@ -46,44 +59,62 @@ public class MediaWikiApi {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return categoryHashMap;
     }
 
-    private static HashMap<String, ArrayList<String>> processApiResponse(String apiResponse, String currUrls) {
+    public static HashMap<String, ArrayList<String>> getMap() {
+        return categoryHashMap;
+    }
+
+    public static ArrayList<String> getCategoriesForItem(String url) {
+        HashMap<String, ArrayList<String>> map = setCategoryMap(url);
+
+        return map.get(url);
+    }
+
+    private static HashMap<String, ArrayList<String>> processApiResponse(String apiResponse, String urlApiString) {
         HashMap<String, ArrayList<String>> hashMap = new HashMap<>();
 
-        String[] nameList = currUrls.split("\\|");
-        final int[] count = { 0 };
-
+        try {
+            urlApiString = URLDecoder.decode(urlApiString, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+    
+        String[] nameList = urlApiString.split("\\|");
+    
         try {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode jsonNode = mapper.readTree(apiResponse);
-
+    
             JsonNode pagesNode = jsonNode.path("query").path("pages");
-
+    
             pagesNode.fields().forEachRemaining(pageEntry -> {
-                String pageTitle = nameList[count[0]];
-                JsonNode pageData = pageEntry.getValue();
-
-                ArrayList<String> categories = new ArrayList<>();
-
-                JsonNode categoriesNode = pageData.path("categories");
-                categoriesNode.forEach(categoryNode -> {
-                    String categoryName = categoryNode.path("title").asText();
-                    categoryName = categoryName.replace("Category:", "");
-                    categories.add(categoryName);
-                });
-
-                hashMap.put(pageTitle, categories);
-
-                count[0]++;
+                String pageTitle = pageEntry.getValue().path("title").asText();
+    
+                for (String name : nameList) {
+                    if (pageTitle.equalsIgnoreCase(name.replace('_', ' '))) {
+                        JsonNode pageData = pageEntry.getValue();
+    
+                        ArrayList<String> categories = new ArrayList<>();
+    
+                        JsonNode categoriesNode = pageData.path("categories");
+                        categoriesNode.forEach(categoryNode -> {
+                            String categoryName = categoryNode.path("title").asText();
+                            categoryName = categoryName.replace("Category:", "");
+                            categories.add(categoryName);
+                        });
+    
+                        hashMap.put(name, categories);
+                    }
+                }
             });
-
+    
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+    
         return hashMap;
     }
+    
 }

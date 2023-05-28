@@ -38,8 +38,9 @@ public class Scraper {
                 if (listLink.contains("+")) {
                     listLink = listLink.replace("+", "%2B");
                 }
+                String[] finalLink = listLink.split("\\#");
                 if (listLink.startsWith("/wiki/") && !listOfUrls.contains(listLink) && !listLink.contains("/wiki/File:")) {
-                    listOfUrls.add("https://en.wikipedia.org" + listLink);
+                    listOfUrls.add("https://en.wikipedia.org" + finalLink[0]);
                 }
 
             } catch (NullPointerException e) {
@@ -49,23 +50,5 @@ public class Scraper {
         }
 
         return listOfUrls;
-    }
-
-    /**
-    * Retrieves all HTML elements containing links found on the specified web page.
-    * Checks the validity of the URL and establishes a connection using the UrlChecker class.
-    * Returns the selected HTML elements.
-    *
-    * @param url the URL of the web page to be scraped
-    * @return a Jsoup Elements object containing the selected HTML elements
-    * @throws IOException if an I/O error occurs while connecting to the URL
-    */
-    public static Elements getElements(String url) throws IOException {
-        UrlChecker.checkMain(url);
-        doc = UrlChecker.checkConnect(url);
-
-        Elements links = doc.select("tr > td > a, tr > td > i > a, p > a, p > i > a");
-
-        return links;
     }
 }
