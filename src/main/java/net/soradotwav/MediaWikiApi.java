@@ -2,7 +2,6 @@ package net.soradotwav;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -33,13 +32,13 @@ public class MediaWikiApi {
         if (urlApiString.isEmpty()) {
             return categoryHashMap;
         }
-
+    
         try {
             URL url = new URL(apiTemplate + urlApiString);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             int responseCode = connection.getResponseCode();
-
+    
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                 String line;
@@ -48,13 +47,13 @@ public class MediaWikiApi {
                     response.append(line);
                 }
                 reader.close();
-
-                categoryHashMap = processApiResponse(response.toString(), urlApiString);
-
+    
+                processApiResponse(response.toString(), urlApiString); // Update the categoryHashMap directly
+    
             } else {
                 System.out.println("API request failed. Response Code: " + responseCode);
             }
-
+    
             connection.disconnect();
         } catch (Exception e) {
             e.printStackTrace();
@@ -72,18 +71,12 @@ public class MediaWikiApi {
         return map.get(url);
     }
 
-    private static HashMap<String, ArrayList<String>> processApiResponse(String apiResponse, String urlApiString) {
-        HashMap<String, ArrayList<String>> hashMap = new HashMap<>();
-
+    private static void processApiResponse(String apiResponse, String urlApiString) {
         try {
             urlApiString = URLDecoder.decode(urlApiString, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
     
-        String[] nameList = urlApiString.split("\\|");
+            String[] nameList = urlApiString.split("\\|");
     
-        try {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode jsonNode = mapper.readTree(apiResponse);
     
@@ -96,7 +89,7 @@ public class MediaWikiApi {
                     if (pageTitle.equalsIgnoreCase(name.replace('_', ' '))) {
                         JsonNode pageData = pageEntry.getValue();
     
-                        ArrayList<String> categories = new ArrayList<>();
+                        ArrayList<String> categories = categoryHashMap.getOrDefault(name, new ArrayList<>());
     
                         JsonNode categoriesNode = pageData.path("categories");
                         categoriesNode.forEach(categoryNode -> {
@@ -105,7 +98,7 @@ public class MediaWikiApi {
                             categories.add(categoryName);
                         });
     
-                        hashMap.put(name, categories);
+                        categoryHashMap.put(name, categories);
                     }
                 }
             });
@@ -113,8 +106,6 @@ public class MediaWikiApi {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    
-        return hashMap;
     }
     
 }
