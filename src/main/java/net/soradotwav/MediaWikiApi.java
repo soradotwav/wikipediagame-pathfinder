@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class MediaWikiApi {
 
-    private static String apiTemplate = "https://en.wikipedia.org/w/api.php?action=query&prop=categories&cllimit=100&format=json&clshow=!hidden&titles=";
+    private static String apiTemplate = "https://en.wikipedia.org/w/api.php?action=query&prop=categories&cllimit=100&format=json&utf8=true&clshow=!hidden&titles=";
     private static HashMap<String, ArrayList<String>> categoryHashMap = new HashMap<>();
 
     public static HashMap<String, ArrayList<String>> setCategoryMap(String urlApiString) {
