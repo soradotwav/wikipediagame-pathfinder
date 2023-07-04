@@ -2,49 +2,37 @@ package net.soradotwav;
 
 import java.io.IOException;
 
+import org.jsoup.Connection;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 public class UrlChecker {
 
-    /**
-    * Checks if the given URL starts with "https://en.wikipedia.org/".
-    * If the URL is invalid, an IllegalArgumentException is thrown with an appropriate error message.
-    * If the URL is valid, the method continues without any exceptions.
-    *
-    * @param url the URL to be checked
-    */
-    public static void checkMain(String url) {
-        if(!url.startsWith("https://en.wikipedia.org/")) {
-            try {
-                throw new IllegalArgumentException("Invalid URL. Must start with 'https://en.wikipedia.org/'");
-            } catch (IllegalArgumentException e) {
-                System.err.println(e.getMessage());
-                System.exit(1);
-            }
+    private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36";
+    private static final String WIKIPEDIA_URL = "https://en.wikipedia.org/";
+
+    public static Document check(String url) throws IOException {
+        validateUrl(url);
+
+        Connection connection = Jsoup.connect(url)
+                    .userAgent(USER_AGENT)
+                    .referrer(WIKIPEDIA_URL);
+
+        try {
+            return connection.get();
+
+        } catch (HttpStatusException e) {
+            System.out.println("Invalid Wikipedia URL. URL does not exist");
+            throw e;
         }
     }
 
-    /**
-    * Connects to the specified URL using Jsoup library and retrieves the web page content.
-    * The method sets the user agent and referrer to mimic a web browser's request.
-    *
-    * @param url the URL to be connected and checked
-    * @return a Jsoup Document representing the web page content
-    * @throws IOException if an I/O error occurs while connecting to the URL
-    */
-    public static Document checkConnect(String url) throws IOException {
-        Document doc = null;
-        try {
-            doc = Jsoup.connect(url)
-                    .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
-                    .referrer("https://en.wikipedia.org/")
-                    .get();
-        } catch (HttpStatusException e) {
-            System.out.println("Invalid Wikipedia URL. URL does not exist");
-            System.exit(1);
+    private static void validateUrl(String url) {
+        
+        if(!url.startsWith(WIKIPEDIA_URL)) {
+            System.out.println("Invalid URL. Must start with " + WIKIPEDIA_URL);
+            return;
         }
-        return doc;
     }
 }
